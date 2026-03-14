@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>CoreInventory — Dashboard</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <link href="styles.css" rel="stylesheet"/>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: { extend: {
+        colors: { "primary": "#1a2b3d", "background-light": "#f6f7f7", "background-dark": "#15191d" },
+        fontFamily: { "display": ["Inter", "sans-serif"] },
+        borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+      }}
+    }
+  </script>
+  <style>body { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display">
+
+<div class="flex h-screen overflow-hidden">
+  <!-- Sidebar Overlay (mobile) -->
+  <div id="sidebar-overlay" class="sidebar-overlay"></div>
+
+  <!-- Sidebar -->
+  <aside class="sidebar w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col">
+    <div class="p-6 flex items-center gap-3">
+      <div class="size-8 bg-primary rounded-lg flex items-center justify-center text-white">
+        <span class="material-symbols-outlined">inventory_2</span>
+      </div>
+      <div>
+        <h1 class="text-primary dark:text-white text-lg font-bold leading-tight">CoreInventory</h1>
+        <p class="text-slate-500 text-xs font-medium uppercase tracking-wider">Management</p>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav flex-1 px-4 space-y-1 overflow-y-auto">
+      <a class="sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg" href="index.html">
+        <span class="material-symbols-outlined">dashboard</span>
+        <span class="text-sm font-medium">Dashboard</span>
+      </a>
+      <a class="sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg" href="products.html">
+        <span class="material-symbols-outlined">package_2</span>
+        <span class="text-sm font-medium">Products</span>
+      </a>
+      <div class="pt-4 pb-2 px-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Operations</div>
+      <a class="sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg" href="receipts.html">
+        <span class="material-symbols-outlined">receipt_long</span>
+        <span class="text-sm font-medium">Receipts</span>
+      </a>
+      <a class="sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg" href="delivery.html">
+        <span class="material-symbols-outlined">local_shipping</span>
+        <span class="text-sm font-medium">Delivery</span>
+      </a>
+      <a class="sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg" href="transfers.html">
+        <span class="material-symbols-outlined">swap_horiz</span>
+        <span class="text-sm font-medium">Transfers</span>
+      </a>
+      <a class="sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg" href="adjustments.html">
+        <span class="material-symbols-outlined">tune</span>
+        <span class="text-sm font-medium">Adjustments</span>
+      </a>
+      <a class="sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg" href="history.html">
+        <span class="material-symbols-outlined">history</span>
+        <span class="text-sm font-medium">Move History</span>
+      </a>
+      <div class="pt-4 pb-2 px-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Account</div>
+      <a class="sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg" href="settings.html">
+        <span class="material-symbols-outlined">settings</span>
+        <span class="text-sm font-medium">Settings</span>
+      </a>
+      <a class="sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg" href="profile.html">
+        <span class="material-symbols-outlined">person</span>
+        <span class="text-sm font-medium">Profile</span>
+      </a>
+    </nav>
+
+    <div class="p-4 border-t border-slate-200 dark:border-slate-800">
+      <div class="flex items-center gap-3 px-2 py-2">
+        <div class="size-8 rounded-full bg-primary/20 flex items-center justify-center text-primary dark:text-slate-100 font-bold text-xs">AR</div>
+        <div class="flex flex-col">
+          <span id="sidebar-user-name" class="text-xs font-bold">Alex Rivera</span>
+          <span id="sidebar-user-role" class="text-[10px] text-slate-500">Warehouse Admin</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="flex-1 flex flex-col overflow-hidden">
+    <!-- Header -->
+    <header class="h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-8">
+      <div class="flex items-center gap-4">
+        <button id="sidebar-toggle" class="md:hidden p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600">
+          <span class="material-symbols-outlined">menu</span>
+        </button>
+        <div class="flex-1 max-w-xl relative">
+          <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg z-10">search</span>
+          <input id="global-search" oninput="handleSearch()" onfocus="handleSearch()" class="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-lg pl-10 pr-4 py-2 text-sm focus:ring-2 focus:ring-primary" placeholder="Search SKU, Product Name or Batch..." type="text" autocomplete="off"/>
+          <div id="search-dropdown" class="hidden absolute top-full left-0 right-0 mt-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl overflow-hidden z-50 max-h-80 overflow-y-auto"></div>
+        </div>
+      </div>
+      <div class="flex items-center gap-4">
+        <button onclick="toggleDarkMode()" class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400" title="Toggle dark mode">
+          <span class="material-symbols-outlined">dark_mode</span>
+        </button>
+        <div class="relative">
+          <button onclick="toggleNotifications()" class="relative p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400">
+            <span class="material-symbols-outlined">notifications</span>
+            <span id="notif-badge" class="absolute top-2 right-2 size-2 bg-red-500 rounded-full border-2 border-white dark:border-slate-900"></span>
+          </button>
+          <div id="notif-dropdown" class="hidden absolute right-0 top-full mt-2 w-80 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl overflow-hidden z-50 animate-scale-in">
+            <div class="px-4 py-3 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+              <span class="text-sm font-bold">Notifications</span>
+              <span class="text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full" id="notif-count">0 new</span>
+            </div>
+            <div id="notif-list" class="max-h-64 overflow-y-auto"></div>
+            <a href="products.html" class="block text-center text-xs font-bold text-primary py-3 border-t border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800">View All Products</a>
+          </div>
+        </div>
+        <div class="h-8 w-[1px] bg-slate-200 dark:bg-slate-800 mx-2"></div>
+        <div class="relative">
+          <button onclick="toggleWhSelector()" class="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+            <span class="material-symbols-outlined text-slate-400 text-lg">warehouse</span>
+            <span id="header-wh" class="text-xs font-semibold text-slate-600 dark:text-slate-300">Main Warehouse</span>
+            <span class="material-symbols-outlined text-slate-400 text-sm">expand_more</span>
+          </button>
+          <div id="wh-selector" class="hidden absolute right-0 top-full mt-2 w-56 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl overflow-hidden z-50 animate-scale-in">
+            <div class="px-4 py-3 border-b border-slate-100 dark:border-slate-800">
+              <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Select Warehouse</span>
+            </div>
+            <div id="wh-options"></div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Dashboard Content -->
+    <div class="flex-1 overflow-y-auto p-8 space-y-8">
+      <!-- KPI Cards -->
+      <div id="kpi-cards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+        <!-- Filled by JS -->
+      </div>
+
+      <!-- Main Section: Table & Trends -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Recent Operations Table -->
+        <div class="lg:col-span-2 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden animate-fade-in-up delay-300">
+          <div class="p-6 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+            <h2 class="text-lg font-bold">Recent Operations</h2>
+            <div class="flex items-center gap-2 flex-wrap">
+              <select id="filter-status" class="text-xs font-semibold border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 rounded-lg py-1 px-3" onchange="renderOperations()">
+                <option value="all">All Status</option>
+                <option value="done">Completed</option>
+                <option value="processing">Processing</option>
+                <option value="waiting">Waiting</option>
+                <option value="ready">Ready</option>
+                <option value="draft">Draft</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
+              <select id="filter-type" class="text-xs font-semibold border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 rounded-lg py-1 px-3" onchange="renderOperations()">
+                <option value="all">All Types</option>
+                <option value="receipt">Receipt</option>
+                <option value="delivery">Delivery</option>
+                <option value="adjustment">Adjustment</option>
+                <option value="transfer">Transfer</option>
+              </select>
+              <select id="filter-warehouse" class="text-xs font-semibold border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 rounded-lg py-1 px-3" onchange="renderOperations()">
+                <option value="all">All Warehouses</option>
+              </select>
+              <select id="filter-category" class="text-xs font-semibold border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 rounded-lg py-1 px-3" onchange="renderOperations()">
+                <option value="all">All Categories</option>
+              </select>
+            </div>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left">
+              <thead class="bg-slate-50 dark:bg-slate-800/50 text-slate-500 text-xs font-bold uppercase">
+                <tr>
+                  <th class="px-6 py-4">Type</th>
+                  <th class="px-6 py-4">Reference</th>
+                  <th class="px-6 py-4">Warehouse</th>
+                  <th class="px-6 py-4">Status</th>
+                  <th class="px-6 py-4 text-right">Date</th>
+                </tr>
+              </thead>
+              <tbody id="ops-tbody" class="divide-y divide-slate-100 dark:divide-slate-800">
+              </tbody>
+            </table>
+          </div>
+          <div class="p-4 border-t border-slate-200 dark:border-slate-800 flex justify-center">
+            <a href="history.html" class="text-xs font-bold text-primary hover:underline">View All Operations</a>
+          </div>
+        </div>
+
+        <!-- Stock Movement Trends -->
+        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-6 flex flex-col animate-fade-in-up delay-400">
+          <div class="flex items-center justify-between mb-6">
+            <h2 class="text-lg font-bold">Stock Movement</h2>
+            <span class="material-symbols-outlined text-slate-400 cursor-pointer hover:text-slate-600">more_horiz</span>
+          </div>
+          <div class="flex-1 flex flex-col">
+            <div class="flex items-baseline gap-2 mb-8">
+              <span id="total-units" class="text-3xl font-bold tracking-tighter counter">0</span>
+              <span class="text-sm font-medium text-slate-500">Total Units</span>
+            </div>
+            <div class="flex-1 flex items-end gap-1.5 h-32 w-full mb-6" id="chart-bars"></div>
+            <div class="space-y-4">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <div class="size-2 rounded-full bg-primary"></div>
+                  <span class="text-xs text-slate-500 font-medium">Inbound Receipts</span>
+                </div>
+                <span class="text-xs font-bold text-emerald-600">+12%</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <div class="size-2 rounded-full bg-primary/30"></div>
+                  <span class="text-xs text-slate-500 font-medium">Outbound Shipments</span>
+                </div>
+                <span class="text-xs font-bold text-red-500">-4.2%</span>
+              </div>
+            </div>
+          </div>
+          <button class="mt-8 w-full py-2.5 rounded-lg border border-slate-200 dark:border-slate-800 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+            Download Analytics
+          </button>
+        </div>
+      </div>
+
+      <!-- Low Stock Alerts -->
+      <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden animate-fade-in-up delay-500">
+        <div class="p-6 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <span class="material-symbols-outlined text-red-500">warning</span>
+            <h2 class="text-lg font-bold">Low Stock Alerts</h2>
+          </div>
+          <a href="products.html" class="text-xs font-bold text-primary hover:underline">View All Products</a>
+        </div>
+        <div id="low-stock-list" class="divide-y divide-slate-100 dark:divide-slate-800"></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="app.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  if (!requireAuth()) return;
+
+  try {
+    const kpis = await getKPIs();
+    const products = await Store.get('products');
+
+    // KPI Cards
+    const kpiData = [
+      { label: 'Total Products', value: kpis.totalProducts, icon: 'inventory', color: 'text-primary', bgColor: 'bg-primary/10', extra: '<span class="text-xs font-semibold text-emerald-600 mb-1">+2.4%</span>', border: '' },
+      { label: 'Low Stock Items', value: kpis.lowStock + kpis.outOfStock, icon: 'warning', color: 'text-red-500', bgColor: 'bg-red-50', extra: '<span class="text-xs font-semibold text-slate-400 mb-1">Critically low</span>', border: 'border-l-4 border-l-red-500' },
+      { label: 'Pending Receipts', value: kpis.pendingReceipts, icon: 'download', color: 'text-blue-500', bgColor: 'bg-blue-50', extra: '<span class="text-xs font-semibold text-emerald-600 mb-1">Active</span>', border: '' },
+      { label: 'Pending Deliveries', value: kpis.pendingDeliveries, icon: 'upload', color: 'text-amber-500', bgColor: 'bg-amber-50', extra: '<span class="text-xs font-semibold text-slate-400 mb-1">In progress</span>', border: '' },
+      { label: 'Transfers Scheduled', value: kpis.scheduledTransfers, icon: 'swap_horiz', color: 'text-indigo-500', bgColor: 'bg-indigo-50', extra: '<span class="text-xs font-semibold text-indigo-500 mb-1">Pending</span>', border: '' },
+    ];
+
+    const kpiLinks = {
+      'Total Products': 'products.html',
+      'Low Stock Items': 'products.html',
+      'Pending Receipts': 'receipts.html',
+      'Pending Deliveries': 'delivery.html',
+      'Transfers Scheduled': 'transfers.html',
+    };
+
+    document.getElementById('kpi-cards').innerHTML = kpiData.map((k, i) => `
+      <a href="${kpiLinks[k.label]}" class="block bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm hover-lift cursor-pointer ${k.border} animate-fade-in-up delay-${i * 100} group">
+        <div class="flex items-center justify-between mb-4">
+          <span class="text-slate-500 text-sm font-medium group-hover:text-primary transition-colors">${k.label}</span>
+          <span class="material-symbols-outlined ${k.color} p-2 ${k.bgColor} rounded-lg">${k.icon}</span>
+        </div>
+        <div class="flex items-end gap-2">
+          <h3 class="text-2xl font-bold tracking-tight ${k.label.includes('Low') ? 'text-red-600' : ''} counter">${k.value.toLocaleString()}</h3>
+          ${k.extra}
+        </div>
+        <div class="mt-3 flex items-center gap-1 text-xs font-medium text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+          <span>View Details</span>
+          <span class="material-symbols-outlined text-sm">arrow_forward</span>
+        </div>
+      </a>
+    `).join('');
+
+    // Total units
+    const totalUnits = products.reduce((s, p) => s + p.stock, 0);
+    document.getElementById('total-units').textContent = totalUnits.toLocaleString();
+
+    // Chart bars
+    const barHeights = [40, 55, 35, 70, 60, 85, 50];
+    const barLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    document.getElementById('chart-bars').innerHTML = barHeights.map((h, i) => `
+      <div class="w-full flex flex-col items-center gap-1">
+      <div class="chart-bar bg-primary/${20 + i * 10 > 100 ? 100 : 20 + i * 10} w-full rounded-t-sm relative group" style="height:${h}%;transition-delay:${i*100}ms">
+        <div class="absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] font-bold opacity-0 group-hover:opacity-100 transition-opacity">${h}</div>
+      </div>
+      <span class="text-[9px] text-slate-400 font-medium">${barLabels[i]}</span>
+    </div>
+  `).join('');
+  setTimeout(() => document.querySelectorAll('.chart-bar').forEach(b => b.classList.add('visible')), 300);
+
+  // Populate warehouse & category filters + warehouse selector
+  const warehouses = Store.get('warehouses');
+  const categories = [...new Set(products.map(p => p.category))];
+
+  // Warehouse selector in header
+  document.getElementById('wh-options').innerHTML = warehouses.map(w =>
+    `<button onclick="selectWarehouse('${w.name}')" class="w-full flex items-center gap-3 px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-left">
+      <span class="material-symbols-outlined text-slate-400 text-lg">warehouse</span>
+      <div><p class="text-sm font-medium">${w.name}</p><p class="text-[10px] text-slate-400">${w.code}</p></div>
+    </button>`
+  ).join('');
+
+  // Notifications
+  const lowStockCount = products.filter(p => p.stock === 0 || p.stock <= p.reorderLevel).length;
+  document.getElementById('notif-count').textContent = lowStockCount + ' alerts';
+  if (lowStockCount === 0) document.getElementById('notif-badge').classList.add('hidden');
+  const notifProducts = products.filter(p => p.stock === 0 || p.stock <= p.reorderLevel).slice(0, 5);
+  document.getElementById('notif-list').innerHTML = notifProducts.map(p =>
+    `<div class="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+      <div class="size-8 rounded-lg ${p.stock === 0 ? 'bg-red-50 dark:bg-red-900/20' : 'bg-amber-50 dark:bg-amber-900/20'} flex items-center justify-center flex-shrink-0">
+        <span class="material-symbols-outlined ${p.stock === 0 ? 'text-red-500' : 'text-amber-500'} text-base">${p.stock === 0 ? 'error' : 'warning'}</span>
+      </div>
+      <div class="flex-1 min-w-0">
+        <p class="text-sm font-medium truncate">${p.name}</p>
+        <p class="text-[10px] text-slate-500">${p.stock === 0 ? 'Out of stock' : 'Low stock: ' + p.stock + ' ' + p.unit + ' left'}</p>
+      </div>
+    </div>`
+  ).join('') || '<div class="px-4 py-6 text-center text-sm text-slate-400">All good! No alerts.</div>';
+
+  const whFilterSelect = document.getElementById('filter-warehouse');
+  warehouses.forEach(w => whFilterSelect.appendChild(Object.assign(document.createElement('option'), { value: w.name, textContent: w.name })));
+  const catFilterSelect = document.getElementById('filter-category');
+  categories.forEach(c => catFilterSelect.appendChild(Object.assign(document.createElement('option'), { value: c, textContent: c })));
+
+  // Operations table
+  renderOperations();
+
+  // Low stock alerts
+  const lowStockProducts = products.filter(p => p.stock === 0 || p.stock <= p.reorderLevel);
+  document.getElementById('low-stock-list').innerHTML = lowStockProducts.length === 0
+    ? '<div class="p-6 text-center text-sm text-slate-400">No low stock alerts. All good!</div>'
+    : lowStockProducts.map(p => `
+    <div class="flex items-center justify-between px-6 py-4 table-row-hover">
+      <div class="flex items-center gap-4">
+        <div class="size-10 rounded-lg ${p.stock === 0 ? 'bg-red-50 dark:bg-red-900/20' : 'bg-amber-50 dark:bg-amber-900/20'} flex items-center justify-center">
+          <span class="material-symbols-outlined ${p.stock === 0 ? 'text-red-500' : 'text-amber-500'} text-lg">${p.stock === 0 ? 'error' : 'warning'}</span>
+        </div>
+        <div>
+          <p class="text-sm font-semibold">${p.name}</p>
+          <p class="text-xs text-slate-500">${p.sku} · ${p.warehouse}</p>
+        </div>
+      </div>
+      <div class="text-right">
+        <p class="text-sm font-bold ${p.stock === 0 ? 'text-red-600' : 'text-amber-600'}">${p.stock} ${p.unit}</p>
+        <p class="text-xs text-slate-400">Reorder at ${p.reorderLevel}</p>
+      </div>
+    </div>
+  `).join('');
+});
+
+  } catch (error) {
+    console.error('Error loading dashboard data:', error);
+    // Show error state
+    document.getElementById('kpi-cards').innerHTML = '<div class="col-span-full text-center py-12 text-red-500">Error loading dashboard data</div>';
+  }
+});
+  try {
+    const history = await Store.get('history');
+    const statusFilter = document.getElementById('filter-status').value;
+    const typeFilter = document.getElementById('filter-type').value;
+
+    // Map history to operations with statuses
+    const receipts = await Store.get('receipts');
+    const deliveries = await Store.get('deliveries');
+    const transfers = await Store.get('transfers');
+    const adjustments = await Store.get('adjustments');
+    const warehouses = await Store.get('warehouses');
+
+    const allOps = [
+      ...receipts.map(r => ({ type: 'receipt', ref: r.ref, warehouse: warehouses.find(w => w.id === r.warehouse)?.name || r.warehouse, status: r.status, date: r.date })),
+      ...deliveries.map(d => ({ type: 'delivery', ref: d.ref, warehouse: warehouses.find(w => w.id === d.warehouse)?.name || d.warehouse, status: d.status, date: d.date })),
+      ...transfers.map(t => ({ type: 'transfer', ref: 'TRF-' + t.id.slice(-3), warehouse: t.from.split('/')[0].trim(), status: t.status, date: t.date })),
+      ...adjustments.map(a => ({ type: 'adjustment', ref: a.ref, warehouse: a.location.split('/')[0].trim(), status: a.status, date: a.date })),
+    ];
+
+    let filtered = allOps;
+    if (statusFilter !== 'all') filtered = filtered.filter(o => o.status === statusFilter);
+    if (typeFilter !== 'all') filtered = filtered.filter(o => o.type === typeFilter);
+    const whFilter = document.getElementById('filter-warehouse').value;
+    if (whFilter !== 'all') filtered = filtered.filter(o => o.warehouse && o.warehouse.includes(whFilter));
+    filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    const typeLabels = { receipt: 'Receipt', delivery: 'Delivery', transfer: 'Transfer', adjustment: 'Adjustment' };
+
+    document.getElementById('ops-tbody').innerHTML = filtered.slice(0, 6).map(op => `
+      <tr class="table-row-hover">
+        <td class="px-6 py-4">
+          <span class="flex items-center gap-2">
+            ${typeIcon(op.type)}
+            <span class="text-sm font-medium">${typeLabels[op.type]}</span>
+          </span>
+        </td>
+        <td class="px-6 py-4 text-sm font-semibold">${op.ref}</td>
+        <td class="px-6 py-4 text-sm text-slate-500">${op.warehouse}</td>
+        <td class="px-6 py-4">${statusBadge(op.status)}</td>
+        <td class="px-6 py-4 text-sm text-slate-500 text-right">${formatDate(op.date)}</td>
+      </tr>
+    `).join('') || '<tr><td colspan="5" class="px-6 py-8 text-center text-slate-400 text-sm">No operations match the filter.</td></tr>';
+  } catch (error) {
+    console.error('Error rendering operations:', error);
+    document.getElementById('ops-tbody').innerHTML = '<tr><td colspan="5" class="px-6 py-8 text-center text-red-400 text-sm">Error loading operations.</td></tr>';
+  }
+}
+
+// ── Search Suggestion Dropdown ──
+async function handleSearch() {
+  const query = document.getElementById('global-search').value.toLowerCase().trim();
+  const dropdown = document.getElementById('search-dropdown');
+  if (!query) { dropdown.classList.add('hidden'); return; }
+
+  try {
+    const products = await Store.get('products');
+    const matches = products.filter(p =>
+      p.name.toLowerCase().includes(query) ||
+      p.sku.toLowerCase().includes(query) ||
+      p.category.toLowerCase().includes(query)
+    ).slice(0, 8);
+
+    if (matches.length === 0) {
+      dropdown.innerHTML = `<div class="px-4 py-6 text-center text-sm text-slate-400">No products found for "<strong>${query}</strong>"</div>`;
+    } else {
+      dropdown.innerHTML = matches.map(p => `
+        <a href="products.html" class="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+          <div class="size-9 rounded-lg ${p.stock > 0 ? 'bg-primary/10' : 'bg-red-50 dark:bg-red-900/20'} flex items-center justify-center flex-shrink-0">
+            <span class="material-symbols-outlined ${p.stock > 0 ? 'text-primary' : 'text-red-500'} text-lg">package_2</span>
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-semibold truncate">${p.name}</p>
+            <p class="text-[10px] text-slate-500">${p.sku} · ${p.category} · ${p.stock} ${p.unit}</p>
+          </div>
+          ${stockStatus(p.stock, p.reorderLevel)}
+        </a>
+      `).join('');
+    }
+    dropdown.classList.remove('hidden');
+  } catch (error) {
+    console.error('Error searching products:', error);
+    dropdown.innerHTML = '<div class="px-4 py-6 text-center text-sm text-red-400">Error searching products</div>';
+    dropdown.classList.remove('hidden');
+  }
+}
+
+// ── Toggle Dropdowns ──
+function toggleUserMenu() {
+  closeAllDropdowns('user-menu');
+  document.getElementById('user-menu').classList.toggle('hidden');
+}
+
+function toggleNotifications() {
+  closeAllDropdowns('notif-dropdown');
+  document.getElementById('notif-dropdown').classList.toggle('hidden');
+}
+
+function toggleWhSelector() {
+  closeAllDropdowns('wh-selector');
+  document.getElementById('wh-selector').classList.toggle('hidden');
+}
+
+function selectWarehouse(name) {
+  document.getElementById('header-wh').textContent = name;
+  document.getElementById('wh-selector').classList.add('hidden');
+  showToast(`Switched to ${name}`, 'info');
+}
+
+function closeAllDropdowns(except) {
+  ['user-menu', 'notif-dropdown', 'wh-selector', 'search-dropdown'].forEach(id => {
+    if (id !== except) document.getElementById(id)?.classList.add('hidden');
+  });
+}
+
+// Close dropdowns when clicking outside
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('#user-menu') && !e.target.closest('[onclick*="toggleUserMenu"]')) {
+    document.getElementById('user-menu')?.classList.add('hidden');
+  }
+  if (!e.target.closest('#notif-dropdown') && !e.target.closest('[onclick*="toggleNotifications"]')) {
+    document.getElementById('notif-dropdown')?.classList.add('hidden');
+  }
+  if (!e.target.closest('#wh-selector') && !e.target.closest('[onclick*="toggleWhSelector"]')) {
+    document.getElementById('wh-selector')?.classList.add('hidden');
+  }
+  if (!e.target.closest('#global-search') && !e.target.closest('#search-dropdown')) {
+    document.getElementById('search-dropdown')?.classList.add('hidden');
+  }
+});
+</script>
+</body>
+</html>

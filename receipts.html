@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>CoreInventory — Receipts</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <link href="styles.css" rel="stylesheet"/>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: { extend: {
+        colors: { "primary": "#1a2b3d", "background-light": "#f6f7f7", "background-dark": "#15191d" },
+        fontFamily: { "display": ["Inter", "sans-serif"] },
+        borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+      }}
+    }
+  </script>
+  <style>body { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display">
+<div class="flex h-screen overflow-hidden">
+  <div id="sidebar-overlay" class="sidebar-overlay"></div>
+  <aside class="sidebar w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col">
+    <div class="p-6 flex items-center gap-3">
+      <div class="size-8 bg-primary rounded-lg flex items-center justify-center text-white"><span class="material-symbols-outlined">inventory_2</span></div>
+      <div><h1 class="text-primary dark:text-white text-lg font-bold leading-tight">CoreInventory</h1><p class="text-slate-500 text-xs font-medium uppercase tracking-wider">Management</p></div>
+    </div>
+    <nav class="sidebar-nav flex-1 px-4 space-y-1 overflow-y-auto">
+      <a class="sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg" href="index.html"><span class="material-symbols-outlined">dashboard</span><span class="text-sm font-medium">Dashboard</span></a>
+      <a class="sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg" href="products.html"><span class="material-symbols-outlined">package_2</span><span class="text-sm font-medium">Products</span></a>
+      <div class="pt-4 pb-2 px-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Operations</div>
+      <a class="sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg" href="receipts.html"><span class="material-symbols-outlined">receipt_long</span><span class="text-sm font-medium">Receipts</span></a>
+      <a class="sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg" href="delivery.html"><span class="material-symbols-outlined">local_shipping</span><span class="text-sm font-medium">Delivery</span></a>
+      <a class="sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg" href="transfers.html"><span class="material-symbols-outlined">swap_horiz</span><span class="text-sm font-medium">Transfers</span></a>
+      <a class="sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg" href="adjustments.html"><span class="material-symbols-outlined">tune</span><span class="text-sm font-medium">Adjustments</span></a>
+      <a class="sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg" href="history.html"><span class="material-symbols-outlined">history</span><span class="text-sm font-medium">Move History</span></a>
+      <div class="pt-4 pb-2 px-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Account</div>
+      <a class="sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg" href="settings.html"><span class="material-symbols-outlined">settings</span><span class="text-sm font-medium">Settings</span></a>
+      <a class="sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg" href="profile.html"><span class="material-symbols-outlined">person</span><span class="text-sm font-medium">Profile</span></a>
+    </nav>
+    <div class="p-4 border-t border-slate-200 dark:border-slate-800">
+      <div class="flex items-center gap-3 px-2 py-2">
+        <div class="size-8 rounded-full bg-primary/20 flex items-center justify-center text-primary dark:text-slate-100 font-bold text-xs">AR</div>
+        <div class="flex flex-col"><span id="sidebar-user-name" class="text-xs font-bold">Alex Rivera</span><span id="sidebar-user-role" class="text-[10px] text-slate-500">Warehouse Admin</span></div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="flex-1 flex flex-col overflow-hidden">
+    <header class="h-16 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center justify-between px-8">
+      <div class="flex items-center gap-4">
+        <button id="sidebar-toggle" class="md:hidden p-2 rounded-lg hover:bg-slate-100"><span class="material-symbols-outlined">menu</span></button>
+        <div>
+          <h2 class="text-xl font-bold text-primary dark:text-slate-100">Incoming Stock Receipts</h2>
+          <p class="text-xs text-slate-500 hidden sm:block">Operations › Receipts</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <button onclick="toggleDarkMode()" class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400"><span class="material-symbols-outlined">dark_mode</span></button>
+        <button onclick="openReceiptPanel()" class="bg-primary hover:bg-primary/90 text-white flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all hover:shadow-lg hover:shadow-primary/20">
+          <span class="material-symbols-outlined text-[20px]">add</span><span>New Receipt</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="flex-1 overflow-y-auto p-8 space-y-6">
+      <!-- Status Tabs -->
+      <div class="flex gap-2 animate-fade-in-up">
+        <button onclick="setFilter('all')" class="tab-btn px-4 py-2 rounded-lg text-sm font-bold bg-primary text-white transition-all" data-tab="all">All Receipts</button>
+        <button onclick="setFilter('draft')" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all" data-tab="draft">Draft</button>
+        <button onclick="setFilter('waiting')" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all" data-tab="waiting">Waiting</button>
+        <button onclick="setFilter('ready')" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all" data-tab="ready">Ready</button>
+        <button onclick="setFilter('done')" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all" data-tab="done">Done</button>
+      </div>
+
+      <!-- Receipts Table -->
+      <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden animate-fade-in-up delay-100">
+        <div class="p-5 border-b border-slate-200 dark:border-slate-800 flex items-center gap-3">
+          <span class="material-symbols-outlined text-slate-400">schedule</span>
+          <h3 class="text-sm font-bold text-slate-700 dark:text-slate-300">Recent Activity</h3>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left">
+            <thead class="bg-slate-50 dark:bg-slate-800/50 text-slate-500 text-xs font-bold uppercase">
+              <tr>
+                <th class="px-6 py-4">Source Document</th>
+                <th class="px-6 py-4">Supplier</th>
+                <th class="px-6 py-4">Destination</th>
+                <th class="px-6 py-4">Status</th>
+                <th class="px-6 py-4 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="receipts-tbody" class="divide-y divide-slate-100 dark:divide-slate-800"></tbody>
+          </table>
+        </div>
+        <div id="receipts-footer" class="px-6 py-4 bg-slate-50 dark:bg-slate-800/30 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between"></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Slide-in Panel: New Receipt -->
+<div id="receipt-panel-overlay" class="hidden slide-panel-overlay" onclick="closeReceiptPanel()"></div>
+<div id="receipt-panel" class="hidden slide-panel w-full max-w-md bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 shadow-2xl">
+  <div class="p-6 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+    <div>
+      <div class="flex items-center gap-2 mb-1">
+        <h3 class="text-lg font-extrabold text-primary dark:text-white">New Stock Receipt</h3>
+        <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-slate-100 dark:bg-slate-800 text-slate-500">New Draft</span>
+      </div>
+      <p class="text-xs text-slate-500">Create incoming shipment entry</p>
+    </div>
+    <button onclick="closeReceiptPanel()" class="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400"><span class="material-symbols-outlined">close</span></button>
+  </div>
+  <div class="p-6 space-y-5 overflow-y-auto" style="max-height: calc(100vh - 180px)">
+    <div>
+      <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Supplier Name</label>
+      <select id="rp-supplier" class="w-full py-2.5 px-4 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm"></select>
+    </div>
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Source Doc (PO#)</label>
+        <input id="rp-ref" type="text" placeholder="e.g. PO-2024-XXX" class="w-full py-2.5 px-4 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm"/>
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Destination WH</label>
+        <select id="rp-warehouse" class="w-full py-2.5 px-4 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm"></select>
+      </div>
+    </div>
+    <div>
+      <div class="flex items-center justify-between mb-3">
+        <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Items to Receive</label>
+        <button type="button" onclick="addReceiptItem()" class="flex items-center gap-1 text-xs font-bold text-primary hover:underline">
+          <span class="material-symbols-outlined text-base">add_circle</span>Add Product
+        </button>
+      </div>
+      <div id="rp-items" class="space-y-3"></div>
+    </div>
+  </div>
+  <div class="p-6 border-t border-slate-200 dark:border-slate-800 flex gap-3">
+    <button onclick="saveReceipt('draft')" class="flex-1 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-sm font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">Save as Draft</button>
+    <button onclick="saveReceipt('done')" class="flex-1 py-2.5 rounded-xl bg-primary text-white text-sm font-bold hover:bg-primary/90 transition-all hover:shadow-lg hover:shadow-primary/20">Validate & Post</button>
+  </div>
+</div>
+
+<script src="app.js"></script>
+<script>
+let activeFilter = 'all';
+
+document.addEventListener('DOMContentLoaded', async () => {
+  if (!requireAuth()) return;
+  try {
+    const warehouses = await Store.get('warehouses');
+    const suppliers = await Store.get('suppliers');
+    const whSelect = document.getElementById('rp-warehouse');
+    warehouses.forEach(w => whSelect.appendChild(Object.assign(document.createElement('option'), { value: w.id, textContent: w.name })));
+    const supSelect = document.getElementById('rp-supplier');
+    supSelect.innerHTML = '<option value="">Select a supplier...</option>';
+    suppliers.forEach(s => supSelect.appendChild(Object.assign(document.createElement('option'), { value: s.name, textContent: s.name })));
+    await addReceiptItem();
+    await renderReceipts();
+  } catch (error) {
+    console.error('Error initializing receipts page:', error);
+    showToast('Error loading page data', 'error');
+  }
+});
+
+function setFilter(f) {
+  activeFilter = f;
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    if (btn.dataset.tab === f) { btn.className = 'tab-btn px-4 py-2 rounded-lg text-sm font-bold bg-primary text-white transition-all'; }
+    else { btn.className = 'tab-btn px-4 py-2 rounded-lg text-sm font-medium text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all'; }
+  });
+  renderReceipts();
+}
+
+async function renderReceipts() {
+  try {
+    let receipts = await Store.get('receipts');
+    if (activeFilter !== 'all') receipts = receipts.filter(r => r.status === activeFilter);
+    const warehouses = await Store.get('warehouses');
+    const allReceipts = await Store.get('receipts');
+
+    document.getElementById('receipts-tbody').innerHTML = receipts.map(r => {
+      const wh = warehouses.find(w => w.id === r.warehouse);
+      return `
+      <tr class="table-row-hover">
+        <td class="px-6 py-4 text-sm font-semibold text-primary dark:text-slate-100">${r.ref}</td>
+        <td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">${r.supplier}</td>
+        <td class="px-6 py-4 text-sm text-slate-500">${wh ? wh.name : r.warehouse}</td>
+        <td class="px-6 py-4">${statusBadge(r.status)}</td>
+        <td class="px-6 py-4 text-right">
+          <button class="p-1.5 text-slate-400 hover:text-primary transition-colors" onclick="viewReceipt('${r.id}')"><span class="material-symbols-outlined text-[20px]">visibility</span></button>
+        </td>
+      </tr>`;
+    }).join('') || '<tr><td colspan="5" class="px-6 py-12 text-center text-slate-400 text-sm">No receipts found.</td></tr>';
+
+    document.getElementById('receipts-footer').innerHTML = `<span class="text-xs text-primary font-medium">Showing ${receipts.length} of ${allReceipts.length} receipts</span><div class="flex gap-2"><button class="px-3 py-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded text-xs font-medium">Prev</button><button class="px-3 py-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded text-xs font-medium">Next</button></div>`;
+  } catch (error) {
+    console.error('Error rendering receipts:', error);
+    document.getElementById('receipts-tbody').innerHTML = '<tr><td colspan="5" class="px-6 py-12 text-center text-red-400 text-sm">Error loading receipts.</td></tr>';
+  }
+}
+
+function viewReceipt(id) { showToast('Opening receipt details...', 'info'); }
+
+function openReceiptPanel() {
+  document.getElementById('receipt-panel-overlay').classList.remove('hidden');
+  document.getElementById('receipt-panel').classList.remove('hidden');
+  document.getElementById('rp-ref').value = 'PO-' + new Date().getFullYear() + '-' + Math.floor(Math.random()*900+100);
+}
+function closeReceiptPanel() {
+  document.getElementById('receipt-panel-overlay').classList.add('hidden');
+  document.getElementById('receipt-panel').classList.add('hidden');
+}
+
+async function addReceiptItem() {
+  try {
+    const products = await Store.get('products');
+    const container = document.getElementById('rp-items');
+    const idx = container.children.length;
+    const div = document.createElement('div');
+    div.className = 'bg-slate-50 dark:bg-slate-800 rounded-xl p-3 space-y-2';
+    div.innerHTML = `
+      <div class="flex items-center justify-between">
+        <select class="rp-product flex-1 py-2 px-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm" onchange="updateItemAvail(this)">
+          <option value="">Select product...</option>
+          ${products.map(p => `<option value="${p.id}" data-stock="${p.stock}" data-unit="${p.unit}">${p.name} (${p.sku})</option>`).join('')}
+        </select>
+        <button onclick="this.closest('.bg-slate-50,.dark\\\\:bg-slate-800').remove()" class="ml-2 p-1 text-slate-400 hover:text-red-500"><span class="material-symbols-outlined text-base">delete</span></button>
+      </div>
+      <div class="grid grid-cols-3 gap-2 text-xs">
+        <div><span class="text-slate-400">Ordered</span><input type="number" class="rp-ordered w-full mt-1 py-1.5 px-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm" min="1" value="1"/></div>
+        <div><span class="text-slate-400">Received</span><input type="number" class="rp-received w-full mt-1 py-1.5 px-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm" min="0" value="0"/></div>
+        <div><span class="text-slate-400">Status</span><div class="rp-item-status mt-1 py-1.5 px-2 rounded-lg text-xs font-bold text-amber-600 bg-amber-50">Pending</div></div>
+      </div>
+    `;
+    container.appendChild(div);
+  } catch (error) {
+    console.error('Error adding receipt item:', error);
+    showToast('Error loading products', 'error');
+  }
+}
+
+function updateItemAvail(select) {
+  const opt = select.selectedOptions[0];
+  // could show available stock, etc.
+}
+
+async function saveReceipt(status) {
+  try {
+    const supplier = document.getElementById('rp-supplier').value;
+    const ref = document.getElementById('rp-ref').value;
+    const warehouse = document.getElementById('rp-warehouse').value;
+    if (!supplier || !ref) { showToast('Please fill in supplier and reference.', 'error'); return; }
+
+    const itemEls = document.querySelectorAll('#rp-items > div');
+    const items = [];
+    itemEls.forEach(el => {
+      const productId = el.querySelector('.rp-product').value;
+      const ordered = parseInt(el.querySelector('.rp-ordered').value) || 0;
+      const received = status === 'done' ? ordered : (parseInt(el.querySelector('.rp-received').value) || 0);
+      if (productId) items.push({ productId, ordered, received });
+    });
+
+    if (items.length === 0) { showToast('Please add at least one product.', 'error'); return; }
+
+    const receipts = await Store.get('receipts');
+    receipts.push({ id: generateId('R'), ref, supplier, warehouse, status, date: todayStr(), items });
+    await Store.set('receipts', receipts);
+
+    // If validated, increase stock
+    if (status === 'done') {
+      const products = await Store.get('products');
+      items.forEach(item => {
+        const p = products.find(x => x.id === item.productId);
+        if (p) {
+          p.stock += item.received;
+          const user = Store.getUser();
+          addHistory('receipt', ref, p.name, '+' + item.received, warehouse, user?.name || 'System');
+        }
+      });
+      await Store.set('products', products);
+      showToast('Receipt validated! Stock updated.', 'success');
+    } else {
+      showToast('Receipt saved as draft.', 'info');
+    }
+
+    closeReceiptPanel();
+    await renderReceipts();
+  } catch (error) {
+    console.error('Error saving receipt:', error);
+    showToast('Error saving receipt', 'error');
+  }
+}
+</script>
+</body>
+</html>

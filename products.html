@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>CoreInventory — Products</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <link href="styles.css" rel="stylesheet"/>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: { extend: {
+        colors: { "primary": "#1a2b3d", "background-light": "#f6f7f7", "background-dark": "#15191d" },
+        fontFamily: { "display": ["Inter", "sans-serif"] },
+        borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+      }}
+    }
+  </script>
+  <style>body { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display">
+<div class="flex h-screen overflow-hidden">
+  <div id="sidebar-overlay" class="sidebar-overlay"></div>
+  <aside class="sidebar w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col">
+    <div class="p-6 flex items-center gap-3">
+      <div class="size-8 bg-primary rounded-lg flex items-center justify-center text-white"><span class="material-symbols-outlined">inventory_2</span></div>
+      <div><h1 class="text-primary dark:text-white text-lg font-bold leading-tight">CoreInventory</h1><p class="text-slate-500 text-xs font-medium uppercase tracking-wider">Management</p></div>
+    </div>
+    <nav class="sidebar-nav flex-1 px-4 space-y-1 overflow-y-auto">
+      <a class="sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg" href="index.html"><span class="material-symbols-outlined">dashboard</span><span class="text-sm font-medium">Dashboard</span></a>
+      <a class="sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg" href="products.html"><span class="material-symbols-outlined">package_2</span><span class="text-sm font-medium">Products</span></a>
+      <div class="pt-4 pb-2 px-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Operations</div>
+      <a class="sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg" href="receipts.html"><span class="material-symbols-outlined">receipt_long</span><span class="text-sm font-medium">Receipts</span></a>
+      <a class="sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg" href="delivery.html"><span class="material-symbols-outlined">local_shipping</span><span class="text-sm font-medium">Delivery</span></a>
+      <a class="sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg" href="transfers.html"><span class="material-symbols-outlined">swap_horiz</span><span class="text-sm font-medium">Transfers</span></a>
+      <a class="sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg" href="adjustments.html"><span class="material-symbols-outlined">tune</span><span class="text-sm font-medium">Adjustments</span></a>
+      <a class="sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg" href="history.html"><span class="material-symbols-outlined">history</span><span class="text-sm font-medium">Move History</span></a>
+      <div class="pt-4 pb-2 px-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Account</div>
+      <a class="sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg" href="settings.html"><span class="material-symbols-outlined">settings</span><span class="text-sm font-medium">Settings</span></a>
+      <a class="sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg" href="profile.html"><span class="material-symbols-outlined">person</span><span class="text-sm font-medium">Profile</span></a>
+    </nav>
+    <div class="p-4 border-t border-slate-200 dark:border-slate-800">
+      <div class="flex items-center gap-3 px-2 py-2">
+        <div class="size-8 rounded-full bg-primary/20 flex items-center justify-center text-primary dark:text-slate-100 font-bold text-xs">AR</div>
+        <div class="flex flex-col"><span id="sidebar-user-name" class="text-xs font-bold">Alex Rivera</span><span id="sidebar-user-role" class="text-[10px] text-slate-500">Warehouse Admin</span></div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="flex-1 flex flex-col overflow-hidden">
+    <header class="h-16 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center justify-between px-8">
+      <div class="flex items-center gap-4">
+        <button id="sidebar-toggle" class="md:hidden p-2 rounded-lg hover:bg-slate-100"><span class="material-symbols-outlined">menu</span></button>
+        <h2 class="text-xl font-bold text-primary dark:text-slate-100">Product Catalog</h2>
+      </div>
+      <div class="flex items-center gap-3">
+        <button onclick="toggleDarkMode()" class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400"><span class="material-symbols-outlined">dark_mode</span></button>
+        <button onclick="openProductModal()" class="bg-primary hover:bg-primary/90 text-white flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all hover:shadow-lg hover:shadow-primary/20">
+          <span class="material-symbols-outlined text-[20px]">add</span><span>Create Product</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="flex-1 overflow-y-auto p-8 space-y-6">
+      <!-- Filters -->
+      <div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm animate-fade-in-up">
+        <div class="flex flex-col md:flex-row gap-4">
+          <div class="flex-1 relative">
+            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+            <input id="search-input" oninput="renderProducts()" class="w-full pl-10 pr-4 py-2 bg-background-light dark:bg-slate-800 border-none rounded-lg focus:ring-2 focus:ring-primary text-sm" placeholder="Search products by name or SKU..." type="text"/>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <select id="filter-category" onchange="renderProducts()" class="px-4 py-2 bg-background-light dark:bg-slate-800 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-300 border-none">
+              <option value="all">All Categories</option>
+            </select>
+            <select id="filter-warehouse" onchange="renderProducts()" class="px-4 py-2 bg-background-light dark:bg-slate-800 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-300 border-none">
+              <option value="all">All Warehouses</option>
+            </select>
+            <select id="filter-stock" onchange="renderProducts()" class="px-4 py-2 bg-background-light dark:bg-slate-800 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-300 border-none">
+              <option value="all">All Stock Levels</option>
+              <option value="instock">In Stock</option>
+              <option value="low">Low Stock</option>
+              <option value="out">Out of Stock</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Products Table -->
+      <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden animate-fade-in-up delay-100">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left">
+            <thead class="bg-background-light dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800">
+              <tr>
+                <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Name</th>
+                <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">SKU</th>
+                <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Category</th>
+                <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Unit</th>
+                <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Total Stock</th>
+                <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Status</th>
+                <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="products-tbody" class="divide-y divide-slate-100 dark:divide-slate-800"></tbody>
+          </table>
+        </div>
+        <div id="products-pagination" class="px-6 py-4 bg-background-light dark:bg-slate-800/50 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between"></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Create/Edit Product Modal -->
+<div id="product-modal" class="hidden">
+  <div class="modal-overlay" onclick="closeProductModal()">
+    <div class="modal-content bg-white dark:bg-slate-900 rounded-2xl p-8 max-w-lg w-full mx-4 shadow-2xl border border-slate-200 dark:border-slate-800" onclick="event.stopPropagation()">
+      <div class="flex items-center justify-between mb-6">
+        <h3 id="modal-title" class="text-xl font-extrabold text-primary dark:text-white">Create Product</h3>
+        <button onclick="closeProductModal()" class="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400"><span class="material-symbols-outlined">close</span></button>
+      </div>
+      <form id="product-form" onsubmit="saveProduct(event)" class="space-y-4">
+        <input type="hidden" id="pf-id"/>
+        <div>
+          <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Product Name</label>
+          <input id="pf-name" type="text" required placeholder="e.g. Steel Rods 10mm" class="w-full py-2.5 px-4 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:ring-2 focus:ring-primary"/>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">SKU / Code</label>
+            <input id="pf-sku" type="text" required placeholder="e.g. STL-100" class="w-full py-2.5 px-4 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:ring-2 focus:ring-primary"/>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Category</label>
+            <select id="pf-category" class="w-full py-2.5 px-4 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:ring-2 focus:ring-primary">
+              <option>Tools</option><option>Hardware</option><option>Lubricants</option><option>PPE</option><option>Electrical</option><option>Electronics</option>
+            </select>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Unit of Measure</label>
+            <select id="pf-unit" class="w-full py-2.5 px-4 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:ring-2 focus:ring-primary">
+              <option>Units</option><option>Box</option><option>Liters</option><option>Pairs</option><option>Meters</option><option>Kg</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Initial Stock</label>
+            <input id="pf-stock" type="number" min="0" value="0" class="w-full py-2.5 px-4 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:ring-2 focus:ring-primary"/>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Warehouse</label>
+            <select id="pf-warehouse" class="w-full py-2.5 px-4 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:ring-2 focus:ring-primary"></select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Reorder Level</label>
+            <input id="pf-reorder" type="number" min="0" value="20" class="w-full py-2.5 px-4 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:ring-2 focus:ring-primary"/>
+          </div>
+        </div>
+        <div class="flex gap-3 pt-4">
+          <button type="button" onclick="closeProductModal()" class="flex-1 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-sm font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">Cancel</button>
+          <button type="submit" class="flex-1 py-2.5 rounded-xl bg-primary text-white text-sm font-bold hover:bg-primary/90 transition-all hover:shadow-lg hover:shadow-primary/20">Save Product</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+<script>
+let currentPage = 1;
+const perPage = 8;
+
+document.addEventListener('DOMContentLoaded', async () => {
+  if (!requireAuth()) return;
+
+  try {
+    // Populate filter dropdowns
+    const products = await Store.get('products');
+    const categories = [...new Set(products.map(p => p.category))];
+    const warehouses = await Store.get('warehouses');
+
+    const catSelect = document.getElementById('filter-category');
+    categories.forEach(c => { const o = document.createElement('option'); o.value = c; o.textContent = c; catSelect.appendChild(o); });
+
+    const whSelect = document.getElementById('filter-warehouse');
+    const pfWhSelect = document.getElementById('pf-warehouse');
+    warehouses.forEach(w => {
+      whSelect.appendChild(Object.assign(document.createElement('option'), { value: w.id, textContent: w.name }));
+      pfWhSelect.appendChild(Object.assign(document.createElement('option'), { value: w.id, textContent: w.name }));
+    });
+
+    renderProducts();
+  } catch (error) {
+    console.error('Error loading data:', error);
+    // Fallback to empty data
+    renderProducts();
+  }
+});
+
+async function getFilteredProducts() {
+  try {
+    let products = await Store.get('products');
+    const search = document.getElementById('search-input').value.toLowerCase();
+    const category = document.getElementById('filter-category').value;
+    const warehouse = document.getElementById('filter-warehouse').value;
+    const stock = document.getElementById('filter-stock').value;
+
+    if (search) products = products.filter(p => p.name.toLowerCase().includes(search) || p.sku.toLowerCase().includes(search));
+    if (category !== 'all') products = products.filter(p => p.category === category);
+    if (warehouse !== 'all') products = products.filter(p => p.warehouse === warehouse);
+    if (stock === 'instock') products = products.filter(p => p.stock > p.reorderLevel);
+    if (stock === 'low') products = products.filter(p => p.stock > 0 && p.stock <= p.reorderLevel);
+    if (stock === 'out') products = products.filter(p => p.stock === 0);
+
+    return products;
+  } catch (error) {
+    console.error('Error getting filtered products:', error);
+    return [];
+  }
+}
+
+async function renderProducts() {
+  try {
+    const products = await getFilteredProducts();
+    const total = products.length;
+    const totalPages = Math.ceil(total / perPage);
+    if (currentPage > totalPages) currentPage = 1;
+    const start = (currentPage - 1) * perPage;
+    const page = products.slice(start, start + perPage);
+
+    document.getElementById('products-tbody').innerHTML = page.map(p => `
+      <tr class="table-row-hover group">
+        <td class="px-6 py-4"><div class="text-sm font-semibold text-primary dark:text-slate-100">${p.name}</div></td>
+        <td class="px-6 py-4"><div class="text-sm text-slate-500">${p.sku}</div></td>
+        <td class="px-6 py-4"><span class="px-2.5 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary dark:bg-primary/20 dark:text-slate-300">${p.category}</span></td>
+        <td class="px-6 py-4 text-sm text-slate-500">${p.unit}</td>
+        <td class="px-6 py-4 text-sm font-medium text-slate-700 dark:text-slate-300">${p.stock}</td>
+        <td class="px-6 py-4">${stockStatus(p.stock, p.reorderLevel)}</td>
+        <td class="px-6 py-4 text-right">
+          <div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+            <button class="p-1.5 text-slate-400 hover:text-primary transition-colors" title="Edit" onclick="editProduct('${p.id}')"><span class="material-symbols-outlined text-[20px]">edit</span></button>
+            <button class="p-1.5 text-slate-400 hover:text-red-500 transition-colors" title="Delete" onclick="deleteProduct('${p.id}')"><span class="material-symbols-outlined text-[20px]">delete</span></button>
+          </div>
+        </td>
+      </tr>
+    `).join('') || '<tr><td colspan="7" class="px-6 py-12 text-center text-slate-400">No products found.</td></tr>';
+
+    document.getElementById('products-pagination').innerHTML = `
+      <p class="text-xs text-slate-500 font-medium">Showing ${start + 1} to ${Math.min(start + perPage, total)} of ${total} products</p>
+      <div class="flex gap-2">
+        <button onclick="changePage(-1)" class="px-3 py-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded text-xs font-medium hover:bg-primary/5 ${currentPage <= 1 ? 'opacity-50 cursor-not-allowed' : ''}">Previous</button>
+        ${Array.from({length: Math.min(totalPages, 5)}, (_, i) => `<button onclick="goToPage(${i+1})" class="px-3 py-1 ${currentPage === i+1 ? 'bg-primary text-white' : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:bg-primary/5'} rounded text-xs font-medium">${i+1}</button>`).join('')}
+        <button onclick="changePage(1)" class="px-3 py-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded text-xs font-medium hover:bg-primary/5 ${currentPage >= totalPages ? 'opacity-50 cursor-not-allowed' : ''}">Next</button>
+      </div>
+    `;
+  } catch (error) {
+    console.error('Error rendering products:', error);
+    document.getElementById('products-tbody').innerHTML = '<tr><td colspan="7" class="px-6 py-12 text-center text-red-400">Error loading products.</td></tr>';
+  }
+}
+
+async function changePage(dir) {
+  try {
+    const products = await getFilteredProducts();
+    const total = Math.ceil(products.length / perPage);
+    currentPage = Math.max(1, Math.min(total, currentPage + dir));
+    await renderProducts();
+  } catch (error) {
+    console.error('Error changing page:', error);
+  }
+}
+async function goToPage(p) {
+  currentPage = p;
+  await renderProducts();
+}
+
+// Utility functions
+function generateId(prefix) {
+  return prefix + Date.now().toString().slice(-6) + Math.random().toString(36).substr(2, 3).toUpperCase();
+}
+
+function showToast(message, type = 'info') {
+  // Simple toast implementation - you can enhance this
+  const toast = document.createElement('div');
+  toast.className = `fixed top-4 right-4 px-4 py-2 rounded-lg text-white text-sm font-medium z-50 ${
+    type === 'success' ? 'bg-green-500' :
+    type === 'error' ? 'bg-red-500' :
+    type === 'warning' ? 'bg-yellow-500' : 'bg-blue-500'
+  }`;
+  toast.textContent = message;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
+}
+
+function stockStatus(stock, reorderLevel) {
+  if (stock === 0) return '<span class="px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400">Out of Stock</span>';
+  if (stock <= reorderLevel) return '<span class="px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400">Low Stock</span>';
+  return '<span class="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400">In Stock</span>';
+}
+
+function requireAuth() {
+  // Simple auth check - you can enhance this with proper authentication
+  return true; // For now, always allow access
+}
+
+function openProductModal(data) {
+  document.getElementById('product-modal').classList.remove('hidden');
+  document.getElementById('modal-title').textContent = data ? 'Edit Product' : 'Create Product';
+  if (data) {
+    document.getElementById('pf-id').value = data.id;
+    document.getElementById('pf-name').value = data.name;
+    document.getElementById('pf-sku').value = data.sku;
+    document.getElementById('pf-category').value = data.category;
+    document.getElementById('pf-unit').value = data.unit;
+    document.getElementById('pf-stock').value = data.stock;
+    document.getElementById('pf-warehouse').value = data.warehouse;
+    document.getElementById('pf-reorder').value = data.reorderLevel;
+  } else {
+    document.getElementById('product-form').reset();
+    document.getElementById('pf-id').value = '';
+  }
+}
+
+function closeProductModal() { document.getElementById('product-modal').classList.add('hidden'); }
+
+async function editProduct(id) {
+  try {
+    const products = await Store.get('products');
+    const p = products.find(x => x.id === id);
+    if (p) openProductModal(p);
+  } catch (error) {
+    console.error('Error editing product:', error);
+    showToast('Error loading product', 'error');
+  }
+}
+
+async function deleteProduct(id) {
+  if (!confirm('Delete this product?')) return;
+
+  try {
+    await Store.apiCall(`/products/${id}`, { method: 'DELETE' });
+    showToast('Product deleted successfully!', 'success');
+    await renderProducts();
+  } catch (error) {
+    console.error('Error deleting product:', error);
+    showToast('Error deleting product', 'error');
+  }
+}
+
+async function saveProduct(e) {
+  e.preventDefault();
+
+  const id = document.getElementById('pf-id').value;
+  const data = {
+    name: document.getElementById('pf-name').value,
+    sku: document.getElementById('pf-sku').value,
+    category: document.getElementById('pf-category').value,
+    unit: document.getElementById('pf-unit').value,
+    stock: parseInt(document.getElementById('pf-stock').value) || 0,
+    warehouse: document.getElementById('pf-warehouse').value,
+    reorderLevel: parseInt(document.getElementById('pf-reorder').value) || 20,
+    location: 'Default',
+  };
+
+  try {
+    if (id) {
+      // Update existing product
+      await Store.apiCall(`/products/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(data)
+      });
+      showToast('Product updated successfully!', 'success');
+    } else {
+      // Create new product
+      data.id = generateId('P');
+      await Store.apiCall('/products', {
+        method: 'POST',
+        body: JSON.stringify(data)
+      });
+      showToast('Product created successfully!', 'success');
+    }
+    closeProductModal();
+    await renderProducts();
+  } catch (error) {
+    console.error('Error saving product:', error);
+    showToast('Error saving product', 'error');
+  }
+}
+</script>
+</body>
+</html>
