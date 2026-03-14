@@ -5,6 +5,7 @@ A modern, modular, and enterprise-grade Inventory Management System (IMS) design
 ## 🚀 Features
 
 ### Core Functionality
+
 - **Real-time Inventory Tracking**: Monitor stock levels, movements, and operations in real-time
 - **Multi-location Support**: Manage inventory across multiple warehouses and locations
 - **Comprehensive Operations**: Handle receipts, deliveries, internal transfers, and stock adjustments
@@ -12,6 +13,7 @@ A modern, modular, and enterprise-grade Inventory Management System (IMS) design
 - **Reporting & Analytics**: Generate detailed reports on inventory movements and history
 
 ### User Experience
+
 - **Responsive Design**: Fully responsive interface for desktops, tablets, and mobile devices
 - **Intuitive Navigation**: Collapsible sidebar with clear menu structure
 - **Data-rich Tables**: High-density tables with advanced filtering and search
@@ -19,6 +21,7 @@ A modern, modular, and enterprise-grade Inventory Management System (IMS) design
 - **Empty States**: Beautiful empty state designs with clear call-to-actions
 
 ### Technical Features
+
 - **Modern Tech Stack**: Built with React 19, Vite, and Tailwind CSS
 - **Component Library**: Modular, reusable components following design system principles
 - **Performance Optimized**: Fast loading with modern bundling and optimization
@@ -44,27 +47,40 @@ A modern, modular, and enterprise-grade Inventory Management System (IMS) design
 ## 🚀 Installation
 
 1. **Clone the repository**
+
    ```bash
    git clone https://github.com/dhruvpatel0007/OdooHackathon01.git
    cd OdooHackathon01
    ```
 
 2. **Install dependencies**
+
    ```bash
    npm install
    ```
 
-3. **Start the development server**
+3. **Environment Setup**
+   - The project uses MongoDB Atlas. Update `.env` with your connection string if needed
+   - Default: `MONGODB_URI=mongodb+srv://jaineelnkansara_db_user:Jaineel@odoohackathon.5qtvlvd.mongodb.net/coreinventory`
+
+4. **Start the backend server**
    ```bash
    npm run dev
    ```
 
-4. **Open your browser**
-   Navigate to `http://localhost:5173/` to view the application.
+5. **Start the frontend (in a separate terminal)**
+   ```bash
+   npx vite
+   ```
+
+6. **Open your browser**
+   - Frontend: `http://localhost:5173/`
+   - Backend API: `http://localhost:3000/`
 
 ## 📖 Usage
 
 ### Navigation
+
 - **Dashboard**: Overview of inventory metrics and recent operations
 - **Products**: Manage product catalog, categories, and stock levels
 - **Operations**: Handle receipts, deliveries, transfers, and adjustments
@@ -72,6 +88,7 @@ A modern, modular, and enterprise-grade Inventory Management System (IMS) design
 - **Settings**: Configure warehouses, users, and system preferences
 
 ### Key Workflows
+
 1. **Receiving Goods**: Navigate to Operations → Receipts to process incoming inventory
 2. **Shipping Orders**: Use Operations → Deliveries for outgoing shipments
 3. **Stock Transfers**: Internal transfers between locations via Operations → Transfers
@@ -101,6 +118,7 @@ CoreInventory/
 ## 🎨 Design System
 
 ### Color Palette
+
 - **Primary**: Indigo (#6366f1)
 - **Success**: Green (#10b981)
 - **Warning**: Amber (#f59e0b)
@@ -109,11 +127,13 @@ CoreInventory/
 - **Surface**: White (#ffffff)
 
 ### Typography
+
 - **Font Family**: Inter/Roboto (system fonts)
 - **Text Sizes**: Responsive scaling from xs to 4xl
 - **Line Heights**: Optimized for readability
 
 ### Components
+
 - **Buttons**: Primary, secondary, and ghost variants
 - **Inputs**: Text, select, and custom form controls
 - **Tables**: Data-dense with sorting and filtering
@@ -132,11 +152,13 @@ npm run lint     # Run ESLint
 ```
 
 ### Code Quality
+
 - **ESLint**: Configured for React and modern JavaScript
 - **Prettier**: Code formatting (recommended extension)
 - **Modular Architecture**: Separation of concerns between UI and business logic
 
 ### Contributing Guidelines
+
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
 3. Commit your changes (`git commit -m 'Add amazing feature'`)
@@ -146,22 +168,29 @@ npm run lint     # Run ESLint
 ## 📊 Current Implementation Status
 
 ### ✅ Completed
+
 - [x] Project setup with Vite and React
 - [x] Tailwind CSS configuration and styling
 - [x] Responsive layout with sidebar and header
 - [x] Dashboard with KPI cards
 - [x] Recent operations table
 - [x] Status badge components
-- [x] Basic navigation structure
+- [x] Backend API with Express and MongoDB
+- [x] Authentication system (JWT-based)
+- [x] Warehouse CRUD operations (API ready)
+- [x] Product CRUD operations (API ready)
+- [x] Complete API routes for all entities
 
 ### 🚧 In Progress
-- [ ] Authentication system
-- [ ] Product management CRUD
-- [ ] Operations workflows
-- [ ] Backend API integration
-- [ ] Database setup
+
+- [ ] Database connectivity (MongoDB Atlas IP whitelisting required)
+- [ ] Frontend-backend integration
+- [ ] Authentication UI components
+- [ ] Product management interface
+- [ ] Operations workflows UI
 
 ### 📋 Planned
+
 - [ ] Advanced filtering and search
 - [ ] Barcode scanning integration
 - [ ] Real-time notifications
@@ -174,6 +203,7 @@ npm run lint     # Run ESLint
 We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details.
 
 ### Development Setup
+
 1. Follow the installation steps above
 2. Ensure you have Node.js v18+
 3. Use the provided ESLint configuration
